@@ -28,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      SizedBox(height: 1.0),
+                      SizedBox(height: 55.0),
                       Image(image: AssetImage('logo.png')),
                       SizedBox(height: 55.0),
                       myTextField("Email", (val) => {_email = val}),
