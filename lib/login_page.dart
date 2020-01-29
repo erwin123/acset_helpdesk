@@ -14,63 +14,59 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints viewportConstraints) {
-      return Scaffold(
-          body: new SingleChildScrollView(
-          child:Container(
-              padding: EdgeInsets.all(20.0),
-              decoration: new BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('member.jpg'), fit: BoxFit.cover)),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    SizedBox(height: 55.0),
-                    Image(image: AssetImage('logo.png')),
-                    SizedBox(height: 55.0),
-                    myTextField("Email", (val) => {_email = val}),
-                    SizedBox(height: 25.0),
-                    myTextField("Password", (val) => {_password = val},
-                        type: true),
-                    SizedBox(
-                      height: 35.0,
-                    ),
-                    Material(
-                      elevation: 2.0,
-                      borderRadius: BorderRadius.circular(8.0),
-                      color: Color(0xffffcc00),
-                      child: MaterialButton(
-                        minWidth: MediaQuery.of(context).size.width,
-                        padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                        onPressed: () {
-                          final form = _formKey.currentState;
-                          form.save();
-                          if (form.validate()) {
-                            print("$_email $_password");
-                            Provider.of<AuthService>(context, listen: false)
-                                .loginUser(email: _email, password: _password);
-                          }
-                        },
-                        child: Text(
-                          "LOGIN",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 18),
+    return Scaffold(
+        body: new SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Container(
+                height: MediaQuery.of(context).size.height,
+                padding: EdgeInsets.all(20.0),
+                decoration: new BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage('member.jpg'), fit: BoxFit.cover)),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      SizedBox(height: 1.0),
+                      Image(image: AssetImage('logo.png')),
+                      SizedBox(height: 55.0),
+                      myTextField("Email", (val) => {_email = val}),
+                      SizedBox(height: 25.0),
+                      myTextField("Password", (val) => {_password = val},
+                          type: true),
+                      SizedBox(height: 35.0),
+                      Material(
+                        elevation: 2.0,
+                        borderRadius: BorderRadius.circular(8.0),
+                        color: Color(0xffffcc00),
+                        child: MaterialButton(
+                          minWidth: MediaQuery.of(context).size.width,
+                          padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                          onPressed: () {
+                            final form = _formKey.currentState;
+                            form.save();
+                            if (form.validate()) {
+                              print("$_email $_password");
+                              Provider.of<AuthService>(context, listen: false)
+                                  .loginUser(
+                                      email: _email, password: _password);
+                            }
+                          },
+                          child: Text(
+                            "LOGIN",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 18),
+                          ),
                         ),
-                      ),
-                    )
-                  ],
-                ),
-              ))));
-    });
+                      )
+                    ],
+                  ),
+                ))));
   }
 
   myTextField(placeholder, Function func, {bool type = false}) {
-    return  TextFormField(
+    return TextFormField(
       onSaved: (value) => func(value),
       obscureText: type,
       style: TextStyle(color: Colors.white),
