@@ -12,8 +12,11 @@ void main() => runApp(
     },
   ),
 );
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -29,6 +32,7 @@ class MyApp extends StatelessWidget {
         // widget for HomePage or LoginPage
         builder: (context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
+            print(snapshot);
             return snapshot.hasData ? HomePage() : LoginPage();
           } else {
             return Container(color: Colors.white);

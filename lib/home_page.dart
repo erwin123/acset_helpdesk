@@ -10,8 +10,19 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
+      drawer: Drawer(
+        elevation: 5,
+      ),
       appBar: AppBar(
-        title: Text("Home Flutter Firebase"),
+        title:Row(
+            children: [
+              Image.asset(
+                'assets/logo.png',
+                fit: BoxFit.contain,
+                height: 32,
+              )
+            ]),
+        backgroundColor: new Color(0xff283271),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.exit_to_app),

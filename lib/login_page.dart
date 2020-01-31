@@ -10,15 +10,30 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   String _password;
-  String _email;
+  String _username;
+//  void initState() {
+//    super.initState();
+//    WidgetsBinding.instance
+//        .addPostFrameCallback((_) => checkLoggedIn());
+//  }
+
+//  checkLoggedIn(){
+////    var loggedIn = Provider.of<AuthService>(context, listen: false)
+////        .checkInternalStore();
+//    print(true);
+//  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
         body: new SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Container(
-                height: MediaQuery.of(context).size.height,
+                height: MediaQuery
+                    .of(context)
+                    .size
+                    .height,
                 padding: EdgeInsets.all(20.0),
                 decoration: new BoxDecoration(
                     image: DecorationImage(
@@ -31,35 +46,49 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(height: 55.0),
                       Image(image: AssetImage('logo.png')),
                       SizedBox(height: 55.0),
-                      myTextField("Email", (val) => {_email = val}),
+                      myTextField("Username", (val)=> {_username = val}),
                       SizedBox(height: 25.0),
-                      myTextField("Password", (val) => {_password = val},
+                      myTextField("Password", (val)=>  {_password = val},
                           type: true),
                       SizedBox(height: 35.0),
-                      Material(
-                        elevation: 2.0,
-                        borderRadius: BorderRadius.circular(8.0),
-                        color: Color(0xffffcc00),
-                        child: MaterialButton(
-                          minWidth: MediaQuery.of(context).size.width,
-                          padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                          onPressed: () {
-                            final form = _formKey.currentState;
-                            form.save();
-                            if (form.validate()) {
-                              print("$_email $_password");
-                              Provider.of<AuthService>(context, listen: false)
-                                  .loginUser(
-                                      email: _email, password: _password);
-                            }
-                          },
-                          child: Text(
-                            "LOGIN",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        ),
+                      myButton("LOGIN", () {
+                        final form = _formKey.currentState;
+                        form.save();
+                        print(form.validate());
+                        if (form.validate()) {
+                          print("$_username $_password");
+                          Provider.of<AuthService>(context, listen: false)
+                              .loginUser(
+                              username: _username, password: _password);
+                        }else{
+
+                        }
+                      }
                       )
+//                      Material(
+//                        elevation: 2.0,
+//                        borderRadius: BorderRadius.circular(8.0),
+//                        color: Color(0xffffcc00),
+//                        child: MaterialButton(
+//                          minWidth: MediaQuery.of(context).size.width,
+//                          padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+//                          onPressed: () {
+//                            final form = _formKey.currentState;
+//                            form.save();
+//                            if (form.validate()) {
+//                              print("$_username $_password");
+//                              Provider.of<AuthService>(context, listen: false)
+//                                  .loginUser(
+//                                      username: _username, password: _password);
+//                            }
+//                          },
+//                          child: Text(
+//                            "LOGIN",
+//                            textAlign: TextAlign.center,
+//                            style: TextStyle(fontSize: 18),
+//                          ),
+//                        ),
+//                      )
                     ],
                   ),
                 ))));
@@ -67,6 +96,13 @@ class _LoginPageState extends State<LoginPage> {
 
   myTextField(placeholder, Function func, {bool type = false}) {
     return TextFormField(
+      validator: (value) {
+        if (value.isEmpty) {
+          return placeholder+' required';
+        }
+        return null;
+      },
+
       onSaved: (value) => func(value),
       obscureText: type,
       style: TextStyle(color: Colors.white),
@@ -76,6 +112,11 @@ class _LoginPageState extends State<LoginPage> {
 //                      fillColor: Colors.white,
 //                      filled: true,
         labelStyle: TextStyle(color: Colors.white),
+        errorBorder: OutlineInputBorder(
+          borderSide: new BorderSide(color: Color(0xffffcc00)),
+          borderRadius: new BorderRadius.circular(0.0),
+        ),
+        errorStyle: TextStyle(color: Color(0xffffcc00)),
         focusedBorder: OutlineInputBorder(
           borderSide: new BorderSide(color: Colors.white),
           borderRadius: new BorderRadius.circular(0.0),
@@ -92,6 +133,37 @@ class _LoginPageState extends State<LoginPage> {
             color: Colors.white,
             width: 1.0,
           ),
+        ),
+      ),
+    );
+  }
+
+  myButton(text, Function func) {
+    return Material(
+      elevation: 2.0,
+      borderRadius: BorderRadius.circular(8.0),
+      color: Color(0xffffcc00),
+      child: MaterialButton(
+        minWidth: MediaQuery
+            .of(context)
+            .size
+            .width,
+        padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+        onPressed: () {
+          func();
+//          final form = _formKey.currentState;
+//          form.save();
+//          if (form.validate()) {
+//            print("$_username $_password");
+//            Provider.of<AuthService>(context, listen: false)
+//                .loginUser(
+//                username: _username, password: _password);
+//          }
+        },
+        child: Text(
+          "LOGIN",
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 18),
         ),
       ),
     );
