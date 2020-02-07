@@ -65,8 +65,10 @@ class AuthService with ChangeNotifier {
       encoding: encoding,
     );
     if (response.statusCode == 200) {
-      var result = json.decode(response.body);
-      print(result);
+      Map<String, dynamic> map = json.decode(response.body);
+      print(map["auth"]);
+    }else{
+      
     }
 //    if (password == 'password123') {
 //      this.credential = new CredentialModel(username: username, token: "token", role:"role");
