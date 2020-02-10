@@ -49,14 +49,13 @@ class AuthService with ChangeNotifier {
 
   // logs in the user if password matches
   Future loginUser({String username, String password}) async {
-
     String URL = globalVariables.BASE_URL+ '/user/IT/login' ;
     LoginModel loginModel = new LoginModel();
     loginModel.username = username;
     loginModel.password = password;
-    print(URL);
+
     String jsonBody = json.encode(loginModel.toMap());
-    print('jsonBody: ${jsonBody}');
+    //print('jsonBody: ${jsonBody}');
     final encoding = Encoding.getByName('utf-8');
     final response = await http.post(
       URL,
@@ -66,9 +65,18 @@ class AuthService with ChangeNotifier {
     );
     if (response.statusCode == 200) {
       Map<String, dynamic> map = json.decode(response.body);
-      print(map["auth"]);
+      print(CredentialModel.fromJson(map).name);
+//      sharedPref.saveString("token", map["token"]);
+//      sharedPref.saveString("username", map["username"]);
+//      sharedPref.saveString("role", map["ur"]);
+//      sharedPref.saveString("email", map["email"]);
+      this.credential = CredentialModel.fromJson(map);
+      await sharedPref.save("credential", CredentialModel.fromJson(map).toJson());
+      notifyListeners();
+      return Future.value(this.credential);
     }else{
-      
+      Future.value(null);
+      return Future.value(null);
     }
 //    if (password == 'password123') {
 //      this.credential = new CredentialModel(username: username, token: "token", role:"role");

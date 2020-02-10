@@ -7,6 +7,16 @@ class SharedPref {
     return json.decode(prefs.getString(key));
   }
 
+  readString(String key) async{
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(key);
+  }
+
+  saveString(String key, value) async{
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(key, value);
+  }
+
   save(String key, value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(key, json.encode(value));

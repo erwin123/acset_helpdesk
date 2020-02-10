@@ -46,10 +46,10 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(height: 55.0),
                       Image(image: AssetImage('logo.png')),
                       SizedBox(height: 55.0),
-                      myTextField("Username", (val)=> {_username = val}),
+                      myTextField("Username", (val) {_username = val;}),
                       SizedBox(height: 25.0),
-                      myTextField("Password", (val)=>  {_password = val},
-                          type: true),
+                      myTextField("Password", (val) {_password = val;},
+                          obscureText: true),
                       SizedBox(height: 35.0),
                       myButton("LOGIN", () {
                         final form = _formKey.currentState;
@@ -58,43 +58,51 @@ class _LoginPageState extends State<LoginPage> {
                         if (form.validate()) {
                           print("$_username $_password");
                           Provider.of<AuthService>(context, listen: false)
-                              .loginUser(
-                              username: _username, password: _password);
+                              .loginUser(username: _username, password: _password).then((val){
+                            if(val == null){
+                              this.myAlert("Username or password not match");
+                            }
+                          });
                         }else{
 
                         }
                       }
                       )
-//                      Material(
-//                        elevation: 2.0,
-//                        borderRadius: BorderRadius.circular(8.0),
-//                        color: Color(0xffffcc00),
-//                        child: MaterialButton(
-//                          minWidth: MediaQuery.of(context).size.width,
-//                          padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-//                          onPressed: () {
-//                            final form = _formKey.currentState;
-//                            form.save();
-//                            if (form.validate()) {
-//                              print("$_username $_password");
-//                              Provider.of<AuthService>(context, listen: false)
-//                                  .loginUser(
-//                                      username: _username, password: _password);
-//                            }
-//                          },
-//                          child: Text(
-//                            "LOGIN",
-//                            textAlign: TextAlign.center,
-//                            style: TextStyle(fontSize: 18),
-//                          ),
-//                        ),
-//                      )
                     ],
                   ),
                 ))));
   }
 
-  myTextField(placeholder, Function func, {bool type = false}) {
+  Future<void> myAlert(String message) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Information'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(message)
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('OK'),
+              textColor: Color(0xff000000),
+              color: Color(0xffffcc00),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  myTextField(placeholder, Function func, {bool obscureText = false}) {
     return TextFormField(
       validator: (value) {
         if (value.isEmpty) {
@@ -104,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
       },
 
       onSaved: (value) => func(value),
-      obscureText: type,
+      obscureText: obscureText,
       style: TextStyle(color: Colors.white),
       cursorColor: Colors.white,
       decoration: InputDecoration(
