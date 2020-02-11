@@ -9,18 +9,27 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:acset_helpdesk/auth_service.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatefulWidget  {
+  final int selectedView;
+  HomePage({Key key, this.selectedView}) : super(key: key);
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
+
 class _HomePageState extends State<HomePage> {
+
   CredentialModel credential;
   SharedPref sharedPref = SharedPref();
-  int selectedView=2;
+  int selectedView;
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => loadPref());
+    setState(() {
+      selectedView = widget.selectedView;
+    });
+
   }
 
   void loadPref() async {
@@ -37,12 +46,30 @@ class _HomePageState extends State<HomePage> {
 
   getDrawerItemWidget(int pos) {
     switch (pos) {
-      case 0:
+      case 0: //main
+        Navigator.pop(context);
         return new MainFragment();
-      case 1:
-        return new TicketViewer();
-      case 2:
+        break;
+      case 1: //my request
+        Navigator.pop(context);
+        return new TicketViewer(viewerType: 1);
+        break;
+      case 2: //my task
+        Navigator.pop(context);
+        return new TicketViewer(viewerType: 2);
+        break;
+      case 3: //Assigner
+        Navigator.pop(context);
+        return new TicketViewer(viewerType: 3);
+        break;
+      case 4: //create
+        Navigator.pop(context);
         return new CreateTicket();
+        break;
+      default:
+        Navigator.pop(context);
+        return new TicketViewer(viewerType: 2);
+        break;
     }
   }
 
@@ -128,7 +155,7 @@ class _HomePageState extends State<HomePage> {
                   title: Text('Create Ticket'),
                   onTap: () {
                     setState(() {
-                      selectedView = 2;
+                      selectedView = 4;
                     });
                     Navigator.pop(context);
                     // Update the state of the app.
@@ -150,7 +177,18 @@ class _HomePageState extends State<HomePage> {
                   title: Text('My Task'),
                   onTap: () {
                     setState(() {
-                      selectedView = 1;
+                      selectedView = 2;
+                    });
+                    Navigator.pop(context);
+                    // Update the state of the app.
+                    // ...
+                  },
+                ),
+                ListTile(
+                  title: Text('Ticket Assigner'),
+                  onTap: () {
+                    setState(() {
+                      selectedView = 3;
                     });
                     Navigator.pop(context);
                     // Update the state of the app.

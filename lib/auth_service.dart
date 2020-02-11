@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:acset_helpdesk/model/credential.dart';
 import 'package:acset_helpdesk/model/login.dart';
 import 'package:acset_helpdesk/services/sharepref.dart';
 import 'package:flutter/material.dart';
 import 'package:acset_helpdesk/static/global_var.dart' as globalVariables;
 import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
 
 class AuthService with ChangeNotifier {
   var currentUser;
@@ -49,7 +51,8 @@ class AuthService with ChangeNotifier {
 
   // logs in the user if password matches
   Future loginUser({String username, String password}) async {
-    String URL = globalVariables.BASE_URL+ '/user/IT/login' ;
+    String URL = globalVariables.BASE_URL+ '/user/IT/login' ; //dev
+    //String URL = globalVariables.BASE_URL+ '/user/login' ;
     LoginModel loginModel = new LoginModel();
     loginModel.username = username;
     loginModel.password = password;
@@ -57,7 +60,13 @@ class AuthService with ChangeNotifier {
     String jsonBody = json.encode(loginModel.toMap());
     //print('jsonBody: ${jsonBody}');
     final encoding = Encoding.getByName('utf-8');
-    final response = await http.post(
+    bool trustSelfSigned = true;
+    HttpClient httpClient = new HttpClient();
+    httpClient.badCertificateCallback = ((X509Certificate cert, String host, int port) => trustSelfSigned);
+    IOClient ioClient = new IOClient(httpClient);
+
+    final response = await ioClient.post(
+    //final response = await http.post(
       URL,
       headers: {"Content-Type": "application/json"},
       body: jsonBody,

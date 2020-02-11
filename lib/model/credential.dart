@@ -4,8 +4,9 @@ class CredentialModel {
   String role;
   String email;
   String name;
+  String dept;
   CredentialModel(
-      {this.username, this.token, this.role, this.email, this.name});
+      {this.username, this.token, this.role, this.email, this.name, this.dept});
 
   factory CredentialModel.fromJson(Map<String, dynamic> json) {
     return new CredentialModel(
@@ -13,7 +14,8 @@ class CredentialModel {
         token: json['token'],
         role: json['role'],
         email: json['email'],
-        name: json['name']);
+        name: json['name'],
+        dept: json['dept']);
   }
 
   Map toMap() {
@@ -23,6 +25,7 @@ class CredentialModel {
     map["role"] = role;
     map["name"] = name;
     map["email"] = email;
+    map["dept"] = dept;
     return map;
   }
 
@@ -34,5 +37,5 @@ class CredentialModel {
 //    return map;
 //  }
   Map<String, dynamic> toJson() =>
-      {'username': username, 'token': token, 'role': role, 'email':email, 'name':name};
+      {'username': username, 'token': token, 'role': role, 'email':email, 'name':name, 'dept':dept};
 }
