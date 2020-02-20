@@ -4,6 +4,7 @@ import 'package:acset_helpdesk/home_page.dart';
 import 'package:acset_helpdesk/model/category.dart';
 import 'package:acset_helpdesk/model/credential.dart';
 import 'package:acset_helpdesk/model/parameter.dart';
+import 'package:acset_helpdesk/services/abstract_request.dart';
 import 'package:acset_helpdesk/services/sharepref.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -38,10 +39,14 @@ class _CreateTicketState extends State<CreateTicket> {
   bool _showAttachment = false;
   String attachName1 = "ATTACHMENT";
   String attachName2 = "PHOTO";
-
+  AbstractRequest abr = new AbstractRequest();
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      Map<String, dynamic> map = await sharedPref.read("credential");
+      setState(() {
+        credential = CredentialModel.fromJson(map);
+      });
       loadCategory();
       loadParameter();
     });
@@ -82,34 +87,11 @@ class _CreateTicketState extends State<CreateTicket> {
     if (file == null)
       return null;
     else {
-      Map<String, dynamic> map = await sharedPref.read("credential");
-      setState(() {
-        credential = CredentialModel.fromJson(map);
-      });
-
-      String URL = globalVariables.BASE_URL + '/ticket/IT/base64upload'; //dev
-      //String URL = globalVariables.BASE_URL + '/ticket/base64upload';
-
-      final encoding = Encoding.getByName('utf-8');
-
-      bool trustSelfSigned = true;
-      HttpClient httpClient = new HttpClient();
-      httpClient.badCertificateCallback =
-          ((X509Certificate cert, String host, int port) => trustSelfSigned);
-      IOClient ioClient = new IOClient(httpClient);
-
       String base64File = base64Encode(file.readAsBytesSync());
       String fileName = file.path.split("/").last;
       var data = {"base64file": base64File, "filename": fileName};
       String jsonBody = json.encode(data);
-      var resUpload = await ioClient.post(URL,
-          headers: {
-            "Content-Type": "application/json",
-            "x-access-token": credential.token
-          },
-          body: jsonBody,
-          encoding: encoding);
-
+      final resUpload = await abr.post('/ticket/IT/base64upload', jsonBody);
       if (resUpload.statusCode == 200) {
         var responseJson = json.decode(resUpload.body);
         return responseJson["filename"];
@@ -146,32 +128,9 @@ class _CreateTicketState extends State<CreateTicket> {
   }
 
   Future loadParameter() async {
-    Map<String, dynamic> map = await sharedPref.read("credential");
-    setState(() {
-      credential = CredentialModel.fromJson(map);
-    });
-    String URL = globalVariables.BASE_URL + '/parameter/IT/parameter_cr'; //dev
-    //String URL = globalVariables.BASE_URL + '/parameter/parameter_cr';
     var crit = {"isActive": true};
     String jsonBody = json.encode(crit);
-    print('jsonBody: ${jsonBody}');
-    final encoding = Encoding.getByName('utf-8');
-
-    bool trustSelfSigned = true;
-    HttpClient httpClient = new HttpClient();
-    httpClient.badCertificateCallback =
-        ((X509Certificate cert, String host, int port) => trustSelfSigned);
-    IOClient ioClient = new IOClient(httpClient);
-
-    final response = await ioClient.post(
-      URL,
-      headers: {
-        "Content-Type": "application/json",
-        "x-access-token": credential.token
-      },
-      body: jsonBody,
-      encoding: encoding,
-    );
+    final response = await abr.post('/parameter/IT/parameter_cr', jsonBody);
     if (response.statusCode == 200) {
       //Map<String, dynamic> map = json.decode(response.body);
       var responseJson = json.decode(response.body);
@@ -184,33 +143,34 @@ class _CreateTicketState extends State<CreateTicket> {
   }
 
   Future loadCategory() async {
-    Map<String, dynamic> map = await sharedPref.read("credential");
-    setState(() {
-      credential = CredentialModel.fromJson(map);
-    });
-    String URL = globalVariables.BASE_URL + '/category/IT/category_cr'; //dev
+//    Map<String, dynamic> map = await sharedPref.read("credential");
+//    setState(() {
+//      credential = CredentialModel.fromJson(map);
+//    });
     //String URL = globalVariables.BASE_URL + '/category/category_cr';
 
     var crit = {"isActive": true};
     String jsonBody = json.encode(crit);
-    print('jsonBody: ${jsonBody}');
-    final encoding = Encoding.getByName('utf-8');
+    final response = await abr.post('/category/IT/category_cr', jsonBody);
+//    print('jsonBody: ${jsonBody}');
+//    final encoding = Encoding.getByName('utf-8');
+//
+//    bool trustSelfSigned = true;
+//    HttpClient httpClient = new HttpClient();
+//    httpClient.badCertificateCallback =
+//        ((X509Certificate cert, String host, int port) => trustSelfSigned);
+//    IOClient ioClient = new IOClient(httpClient);
+//
+//    final response = await ioClient.post(
+//      URL,
+//      headers: {
+//        "Content-Type": "application/json",
+//        "x-access-token": credential.token
+//      },
+//      body: jsonBody,
+//      encoding: encoding,
+//    );
 
-    bool trustSelfSigned = true;
-    HttpClient httpClient = new HttpClient();
-    httpClient.badCertificateCallback =
-        ((X509Certificate cert, String host, int port) => trustSelfSigned);
-    IOClient ioClient = new IOClient(httpClient);
-
-    final response = await ioClient.post(
-      URL,
-      headers: {
-        "Content-Type": "application/json",
-        "x-access-token": credential.token
-      },
-      body: jsonBody,
-      encoding: encoding,
-    );
     if (response.statusCode == 200) {
       //Map<String, dynamic> map = json.decode(response.body);
       var responseJson = json.decode(response.body);
@@ -370,38 +330,16 @@ class _CreateTicketState extends State<CreateTicket> {
 
   void doSubmit(data) async {
     this.onLoading((context) async {
-      Map<String, dynamic> map = await sharedPref.read("credential");
-      setState(() {
-        credential = CredentialModel.fromJson(map);
-      });
       data["pName"] = credential.name;
       data["createBy"] = "ACSET\\"+credential.username;
       data["pMail"] = credential.email;
       data["pDept"] = credential.dept;
       data["pAttach1"] = await doUpload(attach1);
       data["pAttach2"] = await doUpload(attach2);
-      print(credential.token);
-      String URL = globalVariables.BASE_URL + '/ticket/IT/'; //dev
-      //String URL = globalVariables.BASE_URL + '/ticket/';
+
       String jsonBody = json.encode(data);
-      print('jsonBody: ${jsonBody}');
-      final encoding = Encoding.getByName('utf-8');
-
-      bool trustSelfSigned = true;
-      HttpClient httpClient = new HttpClient();
-      httpClient.badCertificateCallback =
-      ((X509Certificate cert, String host, int port) => trustSelfSigned);
-      IOClient ioClient = new IOClient(httpClient);
-
-      final response = await ioClient.post(
-        URL,
-        headers: {
-          "Content-Type": "application/json",
-          "x-access-token": credential.token
-        },
-        body: jsonBody,
-        encoding: encoding,
-      );
+      final response = await abr.post('/ticket/IT/', jsonBody);
+      print(jsonBody);
       if (response.statusCode == 200) {
         Navigator.pop(context);
         var responseJson = json.decode(response.body);

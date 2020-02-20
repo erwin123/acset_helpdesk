@@ -43,7 +43,15 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      SizedBox(height: 55.0),
+                      SizedBox(height: 95.0),
+                      Row(
+                        children: <Widget>[
+
+                          Text("Helpdesk", textAlign: TextAlign.right, style: TextStyle(fontSize: 20, color: Colors.white),),
+                          Expanded(flex: 1, child:Container(width: 100))
+                        ],
+                      ),
+
                       Image(image: AssetImage('logo.png')),
                       SizedBox(height: 55.0),
                       myTextField("Username", (val) {_username = val;}),
